@@ -55,7 +55,7 @@ app.get("/", (req, res) => {
 // POST /soap-note - Generate SOAP note from consultation summary
 app.post("/soap-note", async (req, res) => {
   try {
-    const { summary } = req.body;
+    const { summary, language } = req.body;
 
     if (!summary || summary.trim() === "") {
       return res.status(400).json({ error: "Summary is required" });
@@ -67,9 +67,24 @@ app.post("/soap-note", async (req, res) => {
         .json({ error: "GEMINI_API_KEY is not configured" });
     }
 
+    const validLanguages = ["english", "hindi"];
+    const lang = (language || "english").toLowerCase();
+    if (!validLanguages.includes(lang)) {
+      return res.status(400).json({
+        error: 'Language must be "english" or "hindi"',
+      });
+    }
+
     const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-    const prompt = `You are a medical assistant. Convert the following clinical consultation summary into a structured SOAP note. 
+    const languageInstructions =
+      lang === "hindi"
+        ? "Write the content of each section in Hindi using Devanagari script, but keep the section headers exactly as SUBJECTIVE, OBJECTIVE, ASSESSMENT, and PLAN."
+        : "Write the full SOAP note in English and keep the section headers exactly as SUBJECTIVE, OBJECTIVE, ASSESSMENT, and PLAN.";
+
+    const prompt = `You are a medical assistant. Convert the following clinical consultation summary into a structured SOAP note.
+
+${languageInstructions}
 
 SOAP Format:
 SUBJECTIVE: Patient's symptoms and complaints as reported
@@ -79,6 +94,8 @@ PLAN: Treatment plan, medications, follow-up
 
 Clinical Summary:
 "${summary}"
+
+Return only the SOAP note with no extra introduction.
 
 Generate the SOAP note now:`;
 

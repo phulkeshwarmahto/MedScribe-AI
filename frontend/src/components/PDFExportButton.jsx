@@ -1,13 +1,21 @@
 import { generatePDF } from "../utils/pdfExport";
 
-export default function PDFExportButton({ soapNote }) {
+export default function PDFExportButton({ soapNote, language = "english" }) {
+  const isHindi = language === "hindi";
+
   const handleExport = () => {
-    generatePDF(soapNote);
+    if (isHindi) {
+      return;
+    }
+
+    generatePDF(soapNote, language);
   };
 
   return (
     <button
       onClick={handleExport}
+      disabled={isHindi}
+      title={isHindi ? "PDF export currently supports English SOAP notes only." : "Export as PDF"}
       style={{
         marginTop: '1.5rem',
         padding: '0.5rem 1.5rem',
@@ -16,10 +24,11 @@ export default function PDFExportButton({ soapNote }) {
         borderRadius: '0.5rem',
         fontWeight: '500',
         border: 'none',
-        cursor: 'pointer',
+        cursor: isHindi ? 'not-allowed' : 'pointer',
+        opacity: isHindi ? 0.6 : 1,
       }}
     >
-      📄 Export as PDF
+      {isHindi ? "PDF export for Hindi coming soon" : "Export as PDF"}
     </button>
   );
 }

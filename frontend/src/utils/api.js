@@ -2,8 +2,8 @@ import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-export const generateSOAP = async (summary) => {
-  const res = await axios.post(`${BASE_URL}/soap-note`, { summary });
+export const generateSOAP = async (summary, language = "english") => {
+  const res = await axios.post(`${BASE_URL}/soap-note`, { summary, language });
   return res.data.soap;
 };
 

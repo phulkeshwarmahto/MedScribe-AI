@@ -2,7 +2,9 @@ export default function LanguageToggle({ language, setLanguage }) {
   return (
     <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
       <button
+        type="button"
         onClick={() => setLanguage("english")}
+        aria-pressed={language === "english"}
         style={{
           padding: '0.5rem 1rem',
           borderRadius: '9999px',
@@ -17,7 +19,9 @@ export default function LanguageToggle({ language, setLanguage }) {
         English
       </button>
       <button
+        type="button"
         onClick={() => setLanguage("hindi")}
+        aria-pressed={language === "hindi"}
         style={{
           padding: '0.5rem 1rem',
           borderRadius: '9999px',
@@ -29,7 +33,7 @@ export default function LanguageToggle({ language, setLanguage }) {
           transition: 'all 0.3s',
         }}
       >
-        हिंदी
+        Hindi
       </button>
     </div>
   );

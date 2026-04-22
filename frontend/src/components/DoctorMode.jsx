@@ -1,4 +1,5 @@
 import { useState } from "react";
+import LanguageToggle from "./LanguageToggle";
 import VoiceInput from "./VoiceInput";
 import LoadingSpinner from "./LoadingSpinner";
 import SOAPNoteDisplay from "./SOAPNoteDisplay";
@@ -6,8 +7,10 @@ import PDFExportButton from "./PDFExportButton";
 import * as api from "../utils/api";
 
 export default function DoctorMode() {
+  const [language, setLanguage] = useState("english");
   const [summary, setSummary] = useState("");
   const [soapNote, setSoapNote] = useState("");
+  const [soapLanguage, setSoapLanguage] = useState("english");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -28,8 +31,9 @@ export default function DoctorMode() {
     setSoapNote("");
 
     try {
-      const result = await api.generateSOAP(summary);
+      const result = await api.generateSOAP(summary, language);
       setSoapNote(result);
+      setSoapLanguage(language);
     } catch (err) {
       setError(err.response?.data?.error || err.message || "An error occurred");
       console.error("Error:", err);
@@ -49,6 +53,13 @@ export default function DoctorMode() {
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div>
+            <label style={{ display: 'block', color: '#374151', fontWeight: '500', marginBottom: '0.5rem' }}>
+              SOAP Note Language
+            </label>
+            <LanguageToggle language={language} setLanguage={setLanguage} />
+          </div>
+
           <VoiceInput onTranscript={handleVoiceTranscript} />
 
           <div>
@@ -104,8 +115,8 @@ export default function DoctorMode() {
 
       {soapNote && (
         <div style={{ backgroundColor: 'white', borderRadius: '0.75rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', padding: '2rem' }}>
-          <SOAPNoteDisplay soap={soapNote} />
-          <PDFExportButton soapNote={soapNote} />
+          <SOAPNoteDisplay soap={soapNote} language={soapLanguage} />
+          <PDFExportButton soapNote={soapNote} language={soapLanguage} />
         </div>
       )}
     </div>
